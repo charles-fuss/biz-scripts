@@ -66,4 +66,4 @@ if __name__ == "__main__":
     earnings_url = "https://api.robinhood.com/midlands/tags/tag/upcoming-earnings/"
     all_earnings = asyncio.run(parse_instruments(earnings_url))
     print(f"All tickers: {[x[0] for x in all_earnings]}")
-    breakpoint()
+    print(f"All descriptions: {[x[1] for x in all_earnings]}")
