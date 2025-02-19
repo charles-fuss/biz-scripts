@@ -1,0 +1,97 @@
+import yfinance as yf
+import pandas as pd
+import argparse
+import pprint
+import json
+import os
+
+
+
+# load config
+with open(os.path.join(os.getcwd(), "config.json"), 'r') as f:
+    config = json.loads(f.read())
+
+class Query():
+    def __init__(self, query_type, query, num_results):
+        self.query_type = query_type
+        self.query = query
+        self.num_results = num_results+1 if num_results is not None else float('inf')
+
+def top_companies(base_query:Query) -> pd.DataFrame():
+    if base_query.query_type == "sector":
+        mark = yf.Sector(base_query.query) # you can then go into industries from a sector
+        return mark.top_companies[:base_query.num_results].map(lambda x: f"{x:,}")
+    else:
+        indus = yf.Industry(base_query.query)
+        return indus.top_companies[:base_query.num_results].map(lambda x: f"{x:,}")
+
+def financials(base_query:Query) -> pd.DataFrame():
+    return yf.Ticker(base_query.query).income_stmt.map(lambda x: f"{x:,}")
+
+
+def get_earnings(base_query:Query) -> pd.DataFrame():
+    return yf.Ticker(base_query.query).get_earnings_dates().map(lambda x: f"{x:,}")
+
+def main():
+
+    parser = argparse.ArgumentParser(prog="yfin-parse", description="yahoo finance parser")
+    parser.add_argument("-i", "--industry", type=str, help="industry to parse")
+    parser.add_argument("-s", "--sector", type=str, help="sector to parse")
+    parser.add_argument("-t", "--ticker", type=str, help="ticker to parse")
+    parser.add_argument("-r", "--results", type=int, default=10, help="number of returned results (default=max=10)")
+    parser.add_argument("-eh", "--earnings-history", action="store_true", help="get earnings history")
+    parser.add_argument("-f", "--financials", action="store_true", help="get finances")
+    parser.add_argument("--list-sectors", action="store_true", help="get the mappings for all of the sectors/industries")
+    parser.add_argument("--top_companies", action="store_true", help="get the top companies for the designated sector/industry")
+    
+    args = parser.parse_args()
+
+    if args.list_sectors:
+        pprint.pprint(config['SECTOR_INDUSTRY_MAPPINGS'])
+    elif args.financials:
+        # search financials 
+        query_config = {
+            "query_type": "financials", 
+            "query": args.ticker, 
+            "num_results": args.results
+        }
+        base_query = Query(**query_config)
+        pprint.pprint(financials(base_query))
+    elif args.industry == args.sector == args.ticker == None :
+        raise ValueError("please select either a sector, industry, or ticker to query")
+    elif args.earnings_history:
+        if args.ticker == None:
+            raise ValueError("please declare a ticker to query")
+        query_config = {
+            "query_type": "earnings", 
+            "query": args.ticker, 
+            "num_results": args.results
+        }
+        base_query = Query(**query_config)
+        pprint.pprint(get_earnings(base_query))
+    elif args.industry != None or args.sector != None:
+        if args.industry != None and args.sector != None:
+            raise ValueError("you must choose EITHER an industry or sector, not both")
+        if args.sector != None:
+            # search sector
+            query_config = {
+                "query_type": "sector", 
+                "query": args.sector, 
+                "num_results": args.results
+            }
+            base_query = Query(**query_config)
+            top = top_companies(base_query)
+        elif args.industry != None:
+            # search industry 
+            query_config = {
+                "query_type": "industry", 
+                "query": args.industry, 
+                "num_results": args.results
+            }
+            base_query = Query(**query_config)
+            top = top_companies(base_query)
+        print("\n\ntop companies for {1} (sector):\n{0}\n\n\n".format(top, base_query.query))
+
+
+if __name__ == "__main__":
+    main()
