@@ -32,6 +32,7 @@ def financials(base_query:Query) -> pd.DataFrame():
 def get_earnings(base_query:Query) -> pd.DataFrame():
     return yf.Ticker(base_query.query).get_earnings_dates().map(lambda x: f"{x:,}")
 
+
 def main():
 
     parser = argparse.ArgumentParser(prog="yfin-parse", description="yahoo finance parser")
@@ -41,13 +42,18 @@ def main():
     parser.add_argument("-r", "--results", type=int, default=10, help="number of returned results (default=max=10)")
     parser.add_argument("-eh", "--earnings-history", action="store_true", help="get earnings history")
     parser.add_argument("-f", "--financials", action="store_true", help="get finances")
-    parser.add_argument("--list-sectors", action="store_true", help="get the mappings for all of the sectors/industries")
+    parser.add_argument("--list_sectors_tops", action="store_true", help="get the mappings for all of the sectors/industries")
+    parser.add_argument("--list_sectors_intraday", action="store_true", help="get the mappings for all of the sectors/industries")
     parser.add_argument("--top_companies", action="store_true", help="get the top companies for the designated sector/industry")
+    parser.add_argument("--top_gainers", action="store_true", help="get the top gainers for the day (>8%)")
+    parser.add_argument("--top_losers", action="store_true", help="get the top losers for the day (<-8%)")
     
     args = parser.parse_args()
 
-    if args.list_sectors:
+    if args.list_sectors_tops:
         pprint.pprint(config['SECTOR_INDUSTRY_MAPPINGS'])
+    elif args.list_sectors_intraday:
+        pprint.pprint(config['SECTORS_INTRADAY'])
     elif args.financials:
         # search financials 
         query_config = {
@@ -57,6 +63,45 @@ def main():
         }
         base_query = Query(**query_config)
         pprint.pprint(financials(base_query))
+    elif args.top_gainers:
+        if not args.sector:
+            raise ValueError("please include a sector to query")
+        try:
+            queries = [
+                yf.EquityQuery('is-in', ["sector", args.sector]) if args.sector else None,
+                # more tbd...
+            ]
+        except ValueError:
+            raise ValueError("sector not found. please consult --list-sectors-intraday for all mappings")
+        # Remove None values from queries list
+        queries = [q for q in queries if q]
+        query = yf.EquityQuery('and', [
+            yf.EquityQuery('is-in', ['exchange', 'NYQ']),
+            yf.EquityQuery('gt', ["intradaypricechange", 8]),
+            *queries # case sensitive
+        ])
+        sc = yf.screen(query=query)
+        print("\ngrowth over {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in sc['quotes']]))
+    elif args.top_losers:
+        if not args.sector:
+            raise ValueError("please include a sector to query")
+        try:
+            queries = [
+                yf.EquityQuery('is-in', ["sector", args.sector]) if args.sector else None,
+                # more tbd...
+            ]
+        except ValueError:
+            raise ValueError("sector not found. please consult --list-sectors-intraday for all mappings")
+        
+        # Remove None values from queries list
+        queries = [q for q in queries if q]
+        query = yf.EquityQuery('and', [
+            yf.EquityQuery('is-in', ['exchange', 'NYQ']),
+            yf.EquityQuery('lt', ["intradaypricechange", -8]),
+            *queries # case sensitive
+        ])
+        sc = yf.screen(query=query)
+        print("\ngrowth under {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in sc['quotes']]))
     elif args.industry == args.sector == args.ticker == None :
         raise ValueError("please select either a sector, industry, or ticker to query")
     elif args.earnings_history:
@@ -91,6 +136,7 @@ def main():
             base_query = Query(**query_config)
             top = top_companies(base_query)
         print("\n\ntop companies for {1} (sector):\n{0}\n\n\n".format(top, base_query.query))
+    
 
 
 if __name__ == "__main__":

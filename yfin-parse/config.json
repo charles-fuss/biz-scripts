@@ -64,5 +64,20 @@
             "utilities-diversified", "utilities-independent-power-producers", "utilities-regulated-electric", 
             "utilities-regulated-gas", "utilities-regulated-water", "utilities-renewable"
         ]
-    }
+    },
+
+    "SECTORS_INTRADAY":[
+        "Basic Materials",
+        "Communication Services",
+        "Consumer Cyclical",
+        "Consumer Defensive",
+        "Energy",
+        "Financial Services",
+        "Healthcare",
+        "Industrials",
+        "Real Estate",
+        "Technology",
+        "Utilities"
+    ]
+    
 }
