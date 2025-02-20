@@ -12,8 +12,6 @@ with open(os.path.join(os.getcwd(), "config.json"), 'r') as f:
 
 def get_earnings(ticker:str) -> Timestamp:
     earnings_dates = yf.Ticker(ticker).get_earnings_dates()
-    if "ASTC" == ticker:
-        breakpoint()
 
     # get most recent NaN earnings date
     try:
@@ -47,5 +45,5 @@ if __name__ == '__main__':
             report_df = report_df.merge(tops, how='outer')
     rn = datetime.now().strftime("%Y-%m-%d")
     report_df = report_df.sort_values(['earnings'], ascending=False)
-    report_df.to_csv(f"reporting/upcoming_earnings_{rn}.csv")
+    report_df.to_csv(f"reporting/upcoming_earnings_{'_'.join([x for x in desired_keys])}_{rn}.csv")
             
