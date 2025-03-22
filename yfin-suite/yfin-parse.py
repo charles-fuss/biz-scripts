@@ -3,6 +3,7 @@ import pandas as pd
 import argparse
 import pprint
 import json
+import time
 import os
 
 
@@ -26,6 +27,10 @@ def top_companies(base_query:Query) -> pd.DataFrame():
         return indus.top_companies[:base_query.num_results].map(lambda x: f"{x:,}")
 
 def financials(base_query:Query) -> pd.DataFrame():
+    desired_info = ['trailingPE', 'forwardPE', 'overallRisk', 'averageVolume', 'marketCap', 'sharesShort', 'currentPrice', 'totalRevenue', 'totalCash', 'totalDebt', 'grossMargins', 'fiftyDayAverageChange', 'fiftyTwoWeekChangePercent', ]
+    financial_info = "\n".join([f"{x}: {y:,}" for (x,y) in yf.Ticker(base_query.query).info.items() if x in desired_info])
+    print(f"{financial_info}\nsleeping 3s so u can appreciate these stats OwO")
+    time.sleep(3)
     return yf.Ticker(base_query.query).income_stmt.map(lambda x: f"{x:,}")
 
 
@@ -42,11 +47,12 @@ def main():
     parser.add_argument("-r", "--results", type=int, default=10, help="number of returned results (default=max=10)")
     parser.add_argument("-eh", "--earnings-history", action="store_true", help="get earnings history")
     parser.add_argument("-f", "--financials", action="store_true", help="get finances")
+    parser.add_argument("-oc", "--output_to_csv", type=str, help="send output to CSV & define output path")
     parser.add_argument("--list_sectors_tops", action="store_true", help="get the mappings for all of the sectors/industries")
     parser.add_argument("--list_sectors_intraday", action="store_true", help="get the mappings for all of the sectors/industries")
     parser.add_argument("--top_companies", action="store_true", help="get the top companies for the designated sector/industry")
-    parser.add_argument("--top_gainers", action="store_true", help="get the top gainers for the day (>8%)")
-    parser.add_argument("--top_losers", action="store_true", help="get the top losers for the day (<-8%)")
+    parser.add_argument("--top_gainers", action="store_true", help="get the top gainers for the day (>8%%)")
+    parser.add_argument("--top_losers", action="store_true", help="get the top losers for the day (<-8%%)")
     
     args = parser.parse_args()
 
@@ -62,7 +68,8 @@ def main():
             "num_results": args.results
         }
         base_query = Query(**query_config)
-        pprint.pprint(financials(base_query))
+        results = financials(base_query)
+        pprint.pprint(results)
     elif args.top_gainers:
         if not args.sector:
             raise ValueError("please include a sector to query")
@@ -75,13 +82,13 @@ def main():
             raise ValueError("sector not found. please consult --list-sectors-intraday for all mappings")
         # Remove None values from queries list
         queries = [q for q in queries if q]
-        query = yf.EquityQuery('and', [
+        base_query = yf.EquityQuery('and', [
             yf.EquityQuery('is-in', ['exchange', 'NYQ']),
             yf.EquityQuery('gt', ["intradaypricechange", 8]),
             *queries # case sensitive
         ])
-        sc = yf.screen(query=query)
-        print("\ngrowth over {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in sc['quotes']]))
+        results = yf.screen(query=base_query)
+        print("\ngrowth over {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in results['quotes']]))
     elif args.top_losers:
         if not args.sector:
             raise ValueError("please include a sector to query")
@@ -95,13 +102,13 @@ def main():
         
         # Remove None values from queries list
         queries = [q for q in queries if q]
-        query = yf.EquityQuery('and', [
+        base_query = yf.EquityQuery('and', [
             yf.EquityQuery('is-in', ['exchange', 'NYQ']),
             yf.EquityQuery('lt', ["intradaypricechange", -8]),
             *queries # case sensitive
         ])
-        sc = yf.screen(query=query)
-        print("\ngrowth under {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in sc['quotes']]))
+        results = yf.screen(query=base_query)
+        print("\ngrowth under {0} pct for {1} (sector): {2}".format(8, 'Technology', [x['symbol'] for x in results['quotes']]))
     elif args.industry == args.sector == args.ticker == None :
         raise ValueError("please select either a sector, industry, or ticker to query")
     elif args.earnings_history:
@@ -113,7 +120,8 @@ def main():
             "num_results": args.results
         }
         base_query = Query(**query_config)
-        pprint.pprint(get_earnings(base_query))
+        results = get_earnings(base_query) 
+        pprint.pprint(results)
     elif args.industry != None or args.sector != None:
         if args.industry != None and args.sector != None:
             raise ValueError("you must choose EITHER an industry or sector, not both")
@@ -125,7 +133,9 @@ def main():
                 "num_results": args.results
             }
             base_query = Query(**query_config)
-            top = top_companies(base_query)
+            results = top_companies(base_query)
+            print("\n\ntop companies for {1} (sector):\n{0}\n\n\n".format(results, base_query.query))
+
         elif args.industry != None:
             # search industry 
             query_config = {
@@ -134,9 +144,15 @@ def main():
                 "num_results": args.results
             }
             base_query = Query(**query_config)
-            top = top_companies(base_query)
-        print("\n\ntop companies for {1} (sector):\n{0}\n\n\n".format(top, base_query.query))
-    
+            results = top_companies(base_query)
+            print("\n\ntop companies for {1} (industry):\n{0}\n\n\n".format(results, base_query.query))
+
+    if args.output_to_csv and type(results) == pd.DataFrame:
+        if '.csv' not in args.output_to_csv:
+            args.output_to_csv = f"{args.output_to_csv}.csv"
+        results.to_csv(f"reporting/{args.output_to_csv}")
+        print(f"successfully saved the query to reporting/{args.output_to_csv}")
+
 
 
 if __name__ == "__main__":
