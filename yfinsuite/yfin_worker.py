@@ -5,10 +5,10 @@ import pprint
 import json
 import os
 
-
+CONFIG_PATH="C:/Users/charl/Documents/biz-scripts/yfinsuite/config.json"
 
 # load config
-with open(os.path.join(os.getcwd(), "config.json"), 'r') as f:
+with open(CONFIG_PATH, 'r') as f:
     config = json.loads(f.read())
 
 class Query():
@@ -30,7 +30,7 @@ def financials(base_query:Query) -> pd.DataFrame():
     # tbd
     ticker = yf.Ticker(base_query.query)
     if base_query.historical:
-        breakpoint()
+        pass        
     desired_info = ['displayName', 'symbol' 'currentPrice', 'industry', 'sector', 'fullExchangeName',  'region', 'market',
                     'totalRevenue', 'totalCash', 'totalDebt', 'overallRisk', 'maxAge', 'volume', 
                     'averageDailyVolume3Month', 'sharesOutstanding', 
@@ -38,7 +38,6 @@ def financials(base_query:Query) -> pd.DataFrame():
                     'averageVolume', 'marketCap', 'sharesShort', 'currentPrice', 
                     'grossMargins', 'fiftyDayAverageChange', 'fiftyTwoWeekChangePercent']
     financial_info = {x:[y] for x,y in ticker.info.items() if x in desired_info}
-    breakpoint()
     return pd.DataFrame(financial_info)
     
 def income_statement(base_query:Query) -> pd.DataFrame():
@@ -88,6 +87,7 @@ def main():
         if not args.to_json:
             pprint.pprint(finances_df.reset_index())
         else:
+            finances_df = finances_df.map(lambda x: x['0'] if isinstance(x, dict) and '0' in x else x)
             print(finances_df.to_json())
     elif args.income_statement:
         if not args.ticker:

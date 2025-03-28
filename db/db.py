@@ -1,8 +1,10 @@
-from yfinsuite.yfin_worker import *
+import sys, os
+sys.path.append(os.path.abspath("C:/Users/charl/Documents/biz-scripts/yfinsuite"))
 import subprocess
 import asyncio
+import json
 import sqlite3
-
+python_path = "C:/Users/charl/Documents/biz-scripts/biz-env/Scripts/python.exe"
 
 # Can use to import .yaml as a dict
 # import yaml
@@ -10,23 +12,43 @@ import sqlite3
 # with open('config.yaml', 'r') as f:
 #     config = yaml.safe_load(f) # returns dict
 
+
+
+
 def db_connection():
-    conn = sqlite3.connect("init.db")
+    conn = sqlite3.connect("stocks.db")
     cursor = conn.cursor()
     return cursor, conn
-
 cursor, conn = db_connection()
 
 
+
 def create_db():
-    with open('db/init.sql', 'r') as sql_file:
+    with open('db/sql/init.sql', 'r') as sql_file:
         create_table_query = sql_file.read()
     conn.execute(create_table_query)
     conn.commit()
-    
-    cursor.close()
-    conn.close()
 
+def insert_row_to_db(row:json) -> int:
+    try:
+        with open('db/sql/insert_row.sql', 'r') as sql_file:
+            query = sql_file.read()
+        cursor.execute(query, {'json': row})
+    except Exception as e:
+        breakpoint()
+        print(f"failed to insert {row['displayName']}\texception: {e}")
+        return 1
+    return 0
+
+if __name__ == '__main__':
+    # Querying the db returns a Row object
+
+    runfrom = r"C:/Users/charl/Documents/biz-scripts"
+    create_db()
+    command = f"{python_path} {runfrom}/yfinsuite/yfin_worker.py -t tsla -f --to_json"
+    data = json.loads(subprocess.run(command, capture_output=True).stdout)
+    insert_row_to_db(data)
+    breakpoint()
 
 # gameplan:
     # We need to amass a dataset concurrently. We can use async to run the yfin_worker.py at maybe 10-20 threads at a time.

@@ -1,8 +1,8 @@
 
 # gameplan:
     # We need to amass a dataset concurrently. We can use async to run the yfin_worker.py at maybe 10-20 threads at a time.
-    # Each thread will hit the yfin endpoint to grab stats. We can store each thread's output as a pd.Series, merging to a DF.
     # Not entirely sure which sectors/tickers the dataset will be composed of (TBD). Also reaaallly want to include historical data.
+    # Each thread will hit the yfin endpoint to grab stats. We can write each thread's output to sqlite
     # Once this final df is composed, we can do some DSA on it -- graphing, dimensionality reduction, variance, clustering --
     # then finally do some cosine similarity/KNN/some hybrid collaborative filtering to find the nearest neighbor. We can
     # also maybe try and predict a data point from its stats? That can be a v2.
