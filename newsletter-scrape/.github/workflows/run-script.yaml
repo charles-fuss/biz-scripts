@@ -28,6 +28,7 @@ jobs:
         env:
           GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
           GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
+        working-directory: newsletter-scrape
         run: python scrape.py
 
 
