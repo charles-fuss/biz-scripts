@@ -6,16 +6,18 @@ import smtplib
 import yaml
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
-# Load email config
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
 
-smtp_server = config["email"]["smtp_server"]
-smtp_port = config["email"]["smtp_port"]
-sender_email = config["email"]["sender_email"]
-sender_password = config["email"]["sender_password"]
-recipient_email = config["email"]["recipient_email"]
+# # Load email config
+# with open("config.yaml", "r") as file:
+#     config = yaml.safe_load(file)
+
+smtp_server = 'smtp.gmail.com'
+smtp_port = 587
+recipient_email = 'charlesfuss8@gmail.com'
+sender_email = os.environ["GMAIL_SMTP_USER"]
+sender_password = os.environ["GMAIL_SMTP_PASSWORD"]
 
 BLOG_URLS = [
     "https://medium.com/airbnb-engineering/",
@@ -47,7 +49,6 @@ BLOG_URLS.extend(
 ]
 
 )
-
 BLOG_URLS.extend([
     "https://newsroom.aboutrobinhood.com/category/engineering/",
     "https://www.coinbase.com/blog/engineering",
