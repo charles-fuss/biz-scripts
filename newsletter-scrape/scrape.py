@@ -15,7 +15,7 @@ import os
 
 smtp_server = 'smtp.gmail.com'
 smtp_port = 587
-recipient_email = 'charlesfuss8@gmail.com'
+recipient_email = ['charlesfuss8@gmail.com', 'cfuss@hioscar.com']
 sender_email = os.environ["GMAIL_SMTP_USER"]
 sender_password = os.environ["GMAIL_SMTP_PASSWORD"]
 
