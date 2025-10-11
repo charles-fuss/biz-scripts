@@ -17,7 +17,3 @@ def openai_query(query):
 
     )
     return resp.output_text
-
-if __name__ == '__main__':
-    resp = openai_query("whats 1+1")
-    print(resp)
