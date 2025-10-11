@@ -1,0 +1,29 @@
+You are my apartment scout. Browse the web.
+
+TIME FILTER
+- Consider ONLY listings posted/updated in the LAST 5 DAYS.
+- Mark any listing NEW if it’s <24h old.
+
+TASK
+- Search StreetEasy, Zillow, Redfin, Realtor.com, Nestoria, ListedBuy, and local broker sites for APARTMENTS FOR RENT that match:
+  • NEIGHBORHOOD: ASTORIA, NY (focus near the Astoria–Ditmars Blvd N/W stop; ≤0.5 mi preferred)
+  • BEDS: 1-2
+  • BUDGET: $2500-$3500 per month
+  • MUST-HAVE: washer/dryer IN UNIT (explicitly stated)
+  • NICE-TO-HAVE: balcony/terrace/outdoor space
+  • HARD EXCLUSIONS: any “Hallets Point” buildings (e.g., 1–10 Halletts Point, 26-01 1st St) and any obvious “yuppie” luxury towers (glass amenity palaces, gaudy marble islands, ultra-new amenity stacks)
+  • STYLE PREFERENCE: small/mid-size walkups, townhomes, prewar/postwar with sensible (not flashy) renovations
+
+OUTPUT
+- Return ONLY THE TOP 5 that best fit, sorted PRICE LOW→HIGH, as a compact table with columns:
+  Price | *NEW* | Address/Building | Distance to Ditmars (mi) | In-Unit W/D (Y/N) | Balcony/Outdoor (Y/N + type) | Floor/Walkup/Elevator | Posted/Updated (timestamp) | Vibe (why NOT yuppie) | Link | Source
+- Compute “Distance to Ditmars” to the Astoria–Ditmars Blvd (N/W) station; include ~mi approximation and compute walking distance.
+- Include a one-line caveat per row if needed (e.g., “wording ambiguous on outdoor space”).
+- After the table, list up to 3 **Near-Miss** options (fail exactly one criterion—state which).
+
+RULES
+- Do NOT ask clarifying questions; make best-effort choices now.
+- Use live browsing and attach citations/links for every listing.
+- Be strict on “in-unit W/D” (exclude “in-building”).
+- Enforce the 5-day recency filter; tag *NEW* if <24h.
+- Exclude anything in or branded as Halletts Point and any amenity-tower vibes even if they match other filters.
