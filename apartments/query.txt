@@ -23,6 +23,7 @@ OUTPUT
 
 RULES
 - Do NOT ask clarifying questions; make best-effort choices now.
+- Prioritize StreetEasy, Zillow, and Realtor.com in your search. Default to the other marketplaces if you cannot come up with five new listings.
 - Use live browsing and attach citations/links for every listing.
 - Be strict on “in-unit W/D” (exclude “in-building”).
 - Enforce the 5-day recency filter; tag *NEW* if <24h.
