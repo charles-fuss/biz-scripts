@@ -13,8 +13,7 @@ recipient_email = ['charlesfuss8@gmail.com', 'gingersakarya@gmail.com']
 
 if __name__ == '__main__':
     with open("query.txt", 'r', encoding='utf-8') as f: query = f.read()
-    resp = "whats 9+10"
-    # resp = openai_query(query)
+    resp = openai_query(query)
 
     email_subject = "Newest Apartments"
     email_body = resp
