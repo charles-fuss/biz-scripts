@@ -28,7 +28,7 @@ jobs:
       - name: Recreate config.yaml from secret
         shell: bash
         run: |
-          echo "${{ secrets.YAML_B64 }}" | base64 -d > config.yaml
+          echo "${{ secrets.YAML_B64 }}" | base64 -d > apartments/config.yaml
           chmod 600 config.yaml
 
       - name: Run script
