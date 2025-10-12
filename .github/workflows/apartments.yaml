@@ -3,7 +3,7 @@ name: Apartment Search
 on:
   schedule:
     # Runs every day at noon
-    - cron: '0 12 * * *'
+    - cron: '0 16 * * *'
   workflow_dispatch:
 
 jobs:
