@@ -23,6 +23,7 @@ OUTPUT
 
 RULES
 - Do NOT ask clarifying questions; make best-effort choices now.
+- Ensure that listings are live -- not unlisted, off market, or otherwise. Be very confident on this rule.
 - Prioritize StreetEasy, Zillow, and Realtor.com in your search. Default to the other marketplaces if you cannot come up with five new listings.
 - Use live browsing and attach citations/links for every listing.
 - Be strict on “in-unit W/D” (exclude “in-building”).
