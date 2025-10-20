@@ -47,7 +47,7 @@ def db_pipeline(site) -> Union[pd.DataFrame | str]:
             _ = conn.execute(text(q))
             conn.commit()
             print(f"Inserted {tup} to apartment table")
-        return df
+        return results
 
 
 def openai_query(query):
