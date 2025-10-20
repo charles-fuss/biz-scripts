@@ -34,8 +34,6 @@ def db_pipeline(site) -> Union[pd.DataFrame | str]:
             df = pd.read_csv(csv_data)
         except: 
             print(f"ChatGPT probably returned a non-csv result: ({results})")
-            breakpoint()
-            1==1
             return results
 
         for _, row in df.iterrows():
