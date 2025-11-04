@@ -1,0 +1,37 @@
+You are my apartment scout. Browse the web.
+
+TIME FILTER
+- Consider ONLY listings posted/updated in the LAST 5 DAYS.
+- Mark any listing NEW if it’s <24h old.
+
+TASK
+- Search StreetEasy, Zillow, Redfin, Realtor.com, Nestoria, ListedBuy, and local broker sites for APARTMENTS FOR RENT that match:
+  • NEIGHBORHOOD: ASTORIA, NY (focus near the Astoria–Ditmars Blvd N/W stop; ≤0.5 mi preferred)
+  • BEDS: 1-2
+  • BUDGET: $2500-$3500 per month
+  • MUST-HAVE: washer/dryer IN UNIT (explicitly stated)
+  • NICE-TO-HAVE: balcony/terrace/outdoor space
+  • HARD EXCLUSIONS: any “Hallets Point” buildings (e.g., 1–10 Halletts Point, 26-01 1st St) and any obvious “yuppie” luxury towers (glass amenity palaces, gaudy marble islands, ultra-new amenity stacks)
+  • STYLE PREFERENCE: small/mid-size walkups, townhomes, prewar/postwar with sensible (not flashy) renovations
+
+OUTPUT
+- Return ONLY THE TOP 5 that best fit AS A CSV, sorted Posted/Updated LOW→HIGH, as a compact table with columns:
+  Price | *NEW* | Address/Building | Distance to Ditmars (mi) | In-Unit W/D (Y/N) | Balcony/Outdoor (Y/N + type) | Floor/Walkup/Elevator | Posted/Updated (timestamp) | Vibe (why NOT yuppie) | Link | Source
+- Compute “Distance to Ditmars” to the Astoria–Ditmars Blvd (N/W) station; include ~mi approximation and compute walking distance.
+- Include a one-line caveat per row if needed (e.g., “wording ambiguous on outdoor space”).
+- After the table, list up to 3 **Near-Miss** options (fail exactly one criterion—state which).
+
+
+RULES
+- Do NOT ask clarifying questions; make best-effort choices now.
+- Ensure that listings are live -- not unlisted, off market, or otherwise. Be very confident on this rule.
+- Use live browsing and attach citations/links for every listing.
+- Be strict on “in-unit W/D” (exclude “in-building”).
+- Enforce the 5-day recency filter; tag *NEW* if <24h.
+- Exclude anything in or branded as Halletts Point and any amenity-tower vibes even if they match other filters.
+- Use the following sources in your search. They have most of the criteria baked in, you just need to isolate the ones that best fit the goals above. Prioritize these sources in the order that they appear (e.g. 4 craigslist sources and 1 redfin is preferred to 2 craigslist and 3 redfin, etc)
+Craigslist: https://newyork.craigslist.org/search/astoria-ny/hhh?hasPic=1&lat=40.7739&laundry=1&lon=-73.9128&max_price=3500&min_bedrooms=2&search_distance=0.8#search=2~gallery~0
+StreetEasy: https://streeteasy.com/for-rent/astoria/price:-3500%7Cbeds:2-3%7Cin_rect:40.764,40.784,-73.932,-73.89%7Camenities:washer_dryer?sort_by=se_score
+Zillow: https://www.zillow.com/queens-new-york-ny-11105/rentals/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-73.93337930974151%2C%22east%22%3A-73.89230932530548%2C%22south%22%3A40.76787112155794%2C%22north%22%3A40.78918929028496%7D%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A62008%2C%22regionType%22%3A7%7D%5D%2C%22filterState%22%3A%7B%22fr%22%3A%7B%22value%22%3Atrue%7D%2C%22fsba%22%3A%7B%22value%22%3Afalse%7D%2C%22fsbo%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22cmsn%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22mp%22%3A%7B%22max%22%3A3500%7D%2C%22beds%22%3A%7B%22min%22%3A2%7D%2C%22lau%22%3A%7B%22value%22%3Atrue%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A15%2C%22usersSearchTerm%22%3A%22New%20York%20NY%2011105%22%7D
+Redfin: https://www.redfin.com/zipcode/11105/rentals/filter/max-price=3.5k,min-beds=2,washer-dryer-in-unit,move-in-date=12%2F1%2F2025
+Compass: https://www.compass.com/for-rent/queens-ny-11105/mapview=40.7886022,-73.8909593,40.764456,-73.9343897/?searchQuery=%7B%22price%22%3A%7B%22max%22%3A%7B%22num%22%3A3500%7D%7D%2C%22has-washer%22%3Atrue%2C%22beds%22%3A%7B%22min%22%3A%7B%22num%22%3A2%7D%7D%7D

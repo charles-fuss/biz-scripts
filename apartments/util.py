@@ -12,19 +12,16 @@ with open("config.yaml", "r") as file:
 
 table = 'apartments'
 
-def db_pipeline(site) -> Union[pd.DataFrame | str]:
+def db_pipeline() -> Union[pd.DataFrame | str]:
     url = config['database']['url']
     engine = sqlalchemy.create_engine(url)
     with engine.connect() as conn:
-        try:
-            with open(f"queries/{site}.txt", 'r', encoding='utf-8') as f: query = f.read()
-        except:
-            raise ValueError(f"No query for site {site}")
-        q = '''select distinct link from apartments where site = '{}' '''.format(site)
+        with open(f"queries/query.txt", 'r', encoding='utf-8') as f: query = f.read()
+        q = '''select distinct link from apartments'''
         exclude = conn.execute(text(q))
         exclude = [f'{x} | ' for x in exclude]
         print(f"Excluding {exclude}")
-        query += f'\nUNDER NO CIRCUMSTANCES SHOULD YOU INCLUDE ANY OF THESE APARTMENTS: {exclude}'
+        query += f'\nUNDER NO CIRCUMSTANCES SHOULD YOU INCLUDE ANY OF THESE APARTMENTS, THEY ARE DUPLICATES: {exclude}'
         
         print(f"Querying ChatGPT")
         results = openai_query(query)
@@ -39,7 +36,7 @@ def db_pipeline(site) -> Union[pd.DataFrame | str]:
         for _, row in df.iterrows():
             link = row['Link']
             id_ = str(random.randint(0, 500000000)) # idc
-            tup = (id_, site, link)
+            tup = (id_, 'all', link)
             q = '''
             INSERT INTO apartments (id, site, link)
             VALUES ({}, '{}', '{}');
@@ -55,9 +52,8 @@ def openai_query(query):
 
     resp = client.responses.create(
         model="gpt-5",         
-        temperature=1,         
         input=query,
-        reasoning={ "effort": "low" },
+        reasoning={ "effort": "high" },
         text={ "verbosity": "low" },
         tools=[{"type": "web_search"}]
 
